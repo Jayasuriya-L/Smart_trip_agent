@@ -3,20 +3,23 @@
 import { useState, useCallback, useRef } from "react";
 import { ChatMessage, Itinerary } from "@/types";
 import { chatApi } from "@/lib/api";
-import { MOCK_ITINERARY, MOCK_WELCOME_MESSAGES } from "@/lib/mockData";
 
 function uid() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-const USE_MOCK = process.env.NEXT_PUBLIC_API_URL === undefined;
+const DEFAULT_WELCOME: string =
+  "Hello! I am your SmartTrip AI travel agent. Where would you like to travel, and what kind of trip are you planning? Tell me your destination, travel dates, group size, and budget to get started.";
 
-export function useChat(sessionId: string) {
+export function useChat(
+  sessionId: string,
+  onMessageSent?: () => void,
+) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: uid(),
       role: "assistant",
-      content: MOCK_WELCOME_MESSAGES[0],
+      content: DEFAULT_WELCOME,
       timestamp: new Date(),
     },
   ]);
@@ -52,25 +55,14 @@ export function useChat(sessionId: string) {
       setIsLoading(true);
 
       try {
-        let responseContent = "";
-        let itinerary: Itinerary | undefined;
+        abortRef.current = new AbortController();
+        const data = await chatApi.sendMessage({
+          message: text,
+          session_id: sessionId,
+        });
 
-        if (USE_MOCK || !process.env.NEXT_PUBLIC_API_URL) {
-          // ── Mock response ──────────────────────────────────────
-          await new Promise((r) => setTimeout(r, 2000));
-          responseContent =
-            "I've researched **Ooty** thoroughly and prepared your personalized 3-day itinerary! 🏔️\n\nThis plan fits within your ₹10,000 budget for 2 travelers, covering must-see attractions, comfortable accommodation, local cuisine, and the iconic Nilgiri Mountain Railway.\n\n> ⚠️ Prices are estimates and may vary. Always verify locally.";
-          itinerary = MOCK_ITINERARY;
-        } else {
-          // ── Real API call ──────────────────────────────────────
-          abortRef.current = new AbortController();
-          const data = await chatApi.sendMessage({
-            message: text,
-            session_id: sessionId,
-          });
-          responseContent = data.message;
-          itinerary = data.itinerary;
-        }
+        const responseContent = data.message;
+        const itinerary: Itinerary | undefined = data.itinerary;
 
         // Replace loading message with real response
         setMessages((prev) =>
@@ -86,6 +78,10 @@ export function useChat(sessionId: string) {
               : m
           )
         );
+
+        if (onMessageSent) {
+          onMessageSent();
+        }
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Something went wrong";
         setError(message);
@@ -94,20 +90,53 @@ export function useChat(sessionId: string) {
         setIsLoading(false);
       }
     },
-    [isLoading, sessionId]
+    [isLoading, sessionId, onMessageSent]
   );
+
+  const loadSession = useCallback(async (sid: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const rawMsgs = await chatApi.getSessionMessages(sid);
+      if (rawMsgs && rawMsgs.length > 0) {
+        const parsed: ChatMessage[] = rawMsgs.map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          timestamp: new Date(m.created_at),
+          itinerary: m.itinerary,
+          isLoading: false,
+        }));
+        setMessages(parsed);
+      } else {
+        setMessages([
+          {
+            id: uid(),
+            role: "assistant",
+            content: DEFAULT_WELCOME,
+            timestamp: new Date(),
+          },
+        ]);
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load session history";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([
       {
         id: uid(),
         role: "assistant",
-        content: MOCK_WELCOME_MESSAGES[0],
+        content: DEFAULT_WELCOME,
         timestamp: new Date(),
       },
     ]);
     setError(null);
   }, []);
 
-  return { messages, isLoading, error, sendMessage, clearMessages };
+  return { messages, isLoading, error, sendMessage, clearMessages, loadSession };
 }

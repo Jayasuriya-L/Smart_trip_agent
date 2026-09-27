@@ -25,6 +25,13 @@ export interface ChatResponse {
   itinerary?: Itinerary;
 }
 
+export interface ChatSessionInfo {
+  session_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // ── Trip Requirements ─────────────────────────────────────────
 export interface TripRequirements {
   from_location: string;

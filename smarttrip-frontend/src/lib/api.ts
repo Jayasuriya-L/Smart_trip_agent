@@ -37,6 +37,28 @@ export const chatApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+
+  listSessions: (): Promise<import("@/types").ChatSessionInfo[]> =>
+    apiFetch<import("@/types").ChatSessionInfo[]>("/api/chat/sessions"),
+
+  getSessionMessages: (
+    sessionId: string
+  ): Promise<
+    Array<{
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      created_at: string;
+      itinerary?: Itinerary;
+    }>
+  > => apiFetch(`/api/chat/sessions/${sessionId}/messages`),
+
+  deleteSession: (
+    sessionId: string
+  ): Promise<{ status: string; session_id: string }> =>
+    apiFetch(`/api/chat/sessions/${sessionId}`, {
+      method: "DELETE",
+    }),
 };
 
 // ── Trips ─────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, KeyboardEvent } from "react";
-import { Send } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -19,7 +19,7 @@ const SUGGESTIONS = [
 export default function ChatInput({
   onSend,
   isLoading,
-  placeholder = "Tell me where you want to travel...",
+  placeholder = "Ask anything about your trip or specify a destination...",
 }: ChatInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -50,15 +50,16 @@ export default function ChatInput({
     <div className="space-y-2">
       {/* Quick suggestion chips (only when empty) */}
       {!value && (
-        <div className="flex flex-wrap gap-2 px-1">
+        <div className="flex flex-wrap gap-1.5 px-1">
           {SUGGESTIONS.map((s) => (
             <button
               key={s}
+              type="button"
               onClick={() => setValue(s)}
               disabled={isLoading}
-              className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full
-                text-slate-600 hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50
-                transition-all duration-150 disabled:opacity-50"
+              className="text-xs px-3 py-1 bg-white border border-slate-200 rounded-full
+                text-slate-600 hover:border-slate-300 hover:bg-slate-50
+                transition-all disabled:opacity-50"
             >
               {s}
             </button>
@@ -66,10 +67,10 @@ export default function ChatInput({
         </div>
       )}
 
-      {/* Input row */}
-      <div className="flex items-end gap-2 bg-white border border-slate-200 rounded-2xl px-4 py-3
-        shadow-card focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100
-        transition-all duration-200">
+      {/* Input container */}
+      <div className="flex items-end gap-2 bg-white border border-slate-200/90 rounded-2xl px-4 py-3
+        shadow-sm focus-within:border-slate-400 focus-within:ring-2 focus-within:ring-slate-100
+        transition-all">
         <textarea
           ref={textareaRef}
           value={value}
@@ -82,22 +83,26 @@ export default function ChatInput({
             placeholder:text-slate-400 leading-relaxed min-h-[24px] max-h-40 disabled:opacity-60"
         />
         <button
+          type="button"
           onClick={submit}
           disabled={!value.trim() || isLoading}
-          className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white
+          className="w-8 h-8 rounded-lg bg-slate-900 text-white
             flex items-center justify-center shrink-0
-            disabled:opacity-40 disabled:cursor-not-allowed
-            hover:from-brand-600 hover:to-brand-700 active:scale-95
-            transition-all duration-150 shadow-sm"
+            disabled:opacity-30 disabled:cursor-not-allowed
+            hover:bg-slate-800 active:scale-95
+            transition-all shadow-xs"
           aria-label="Send message"
         >
-          <Send size={15} strokeWidth={2.5} />
+          <ArrowUp size={16} strokeWidth={2.5} />
         </button>
       </div>
 
-      <p className="text-xs text-slate-400 px-1">
-        Press <kbd className="px-1 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-[10px]">Enter</kbd> to send · Shift+Enter for new line
-      </p>
+      <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+        <span>
+          Press <kbd className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 font-mono text-[10px]">Enter</kbd> to send
+        </span>
+        <span className="text-[10px] text-slate-400">Shift + Enter for new line</span>
+      </div>
     </div>
   );
 }

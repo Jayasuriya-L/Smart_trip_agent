@@ -48,8 +48,11 @@ async def create_trip(
     try:
         ack, itinerary = await _groq.chat(prompt, [])
     except Exception as exc:
-        logger.error("Failed to generate itinerary: %s", exc)
-        itinerary = None
+        logger.exception("Failed to generate itinerary: %s", exc)
+        raise HTTPException(
+            status_code=502,
+            detail=f"AI service failed to generate itinerary: {exc}",
+        )
 
     trip = TripModel(
         id=str(uuid.uuid4()),

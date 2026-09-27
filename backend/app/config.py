@@ -15,7 +15,13 @@ class Settings(BaseSettings):
     app_secret_key: str = "change_me_in_production"
     cors_origins: str = "http://localhost:3000"
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # In Docker: env vars are injected directly via env_file in docker-compose.
+    # Locally: pydantic-settings finds .env in the current working directory.
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     @property
     def cors_origins_list(self) -> list[str]:

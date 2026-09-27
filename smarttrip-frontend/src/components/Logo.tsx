@@ -1,5 +1,5 @@
 import React from "react";
-import { Plane } from "lucide-react";
+import { Compass } from "lucide-react";
 import Link from "next/link";
 
 interface LogoProps {
@@ -8,9 +8,9 @@ interface LogoProps {
 }
 
 const sizes = {
-  sm: { icon: 18, text: "text-base", wrap: "gap-1.5" },
-  md: { icon: 22, text: "text-lg",   wrap: "gap-2"   },
-  lg: { icon: 28, text: "text-2xl",  wrap: "gap-2.5" },
+  sm: { icon: 16, text: "text-sm", wrap: "gap-1.5" },
+  md: { icon: 18, text: "text-base", wrap: "gap-2" },
+  lg: { icon: 22, text: "text-lg", wrap: "gap-2.5" },
 };
 
 export default function Logo({ size = "md", white = false }: LogoProps) {
@@ -18,24 +18,29 @@ export default function Logo({ size = "md", white = false }: LogoProps) {
   return (
     <Link href="/" className={`flex items-center ${s.wrap} group select-none`}>
       <div
-        className={`flex items-center justify-center rounded-xl p-1.5
-          ${white
-            ? "bg-white/20 group-hover:bg-white/30"
-            : "bg-gradient-to-br from-brand-500 to-teal-500 group-hover:from-brand-600 group-hover:to-teal-600"
-          } transition-all duration-200`}
+        className={`flex items-center justify-center rounded-lg p-1.5 transition-colors
+          ${white ? "bg-white/10 text-white" : "bg-slate-900 text-white"}`}
       >
-        <Plane
-          size={s.icon}
-          className={white ? "text-white" : "text-white"}
-          strokeWidth={2}
-        />
+        <Compass size={s.icon} strokeWidth={2.2} />
       </div>
-      <span
-        className={`font-bold ${s.text} ${white ? "text-white" : "text-slate-800"} tracking-tight`}
-      >
-        Smart<span className={white ? "text-teal-300" : "text-brand-600"}>Trip</span>
-        <span className={`font-light ${white ? "text-white/80" : "text-slate-500"}`}> AI</span>
-      </span>
+      <div className="flex items-baseline gap-1">
+        <span
+          className={`font-semibold tracking-tight ${s.text} ${
+            white ? "text-white" : "text-slate-900"
+          }`}
+        >
+          SmartTrip
+        </span>
+        <span
+          className={`text-[10px] font-medium tracking-wide uppercase px-1.5 py-0.5 rounded ${
+            white
+              ? "bg-white/10 text-white/80"
+              : "bg-slate-100 text-slate-600 border border-slate-200"
+          }`}
+        >
+          AI
+        </span>
+      </div>
     </Link>
   );
 }
