@@ -11,10 +11,10 @@ import { Trip } from "@/types";
 import { Menu, Bot, AlertTriangle } from "lucide-react";
 
 const EXAMPLE_PROMPTS = [
-  { emoji: "🏔️", text: "Plan a 3-day trip to Ooty",       sub: "for 2 people, ₹10,000 budget" },
-  { emoji: "🏖️", text: "Plan a budget trip to Goa",        sub: "5 days, backpacker style" },
-  { emoji: "🌿", text: "Find a weekend getaway",            sub: "from Bangalore, nature & hills" },
-  { emoji: "🏰", text: "Heritage tour — Rajasthan",         sub: "7 days, family of 4" },
+  { text: "Plan a 3-day trip to Ooty", sub: "for 2 people, ₹10,000 budget" },
+  { text: "Plan a budget trip to Goa", sub: "5 days, backpacker style" },
+  { text: "Find a weekend getaway", sub: "from Bangalore, nature and hills" },
+  { text: "Heritage tour in Rajasthan", sub: "7 days, family of 4" },
 ];
 
 function uid() {
@@ -50,7 +50,7 @@ function ChatPageInner() {
   const handleNewTrip = () => {
     clearMessages();
     setSidebarOpen(false);
-    addToast("Started a new trip! 🗺️", "success");
+    addToast("Started a new trip.", "success");
   };
 
   const handleSelectTrip = (trip: Trip) => {
@@ -130,7 +130,6 @@ function ChatPageInner() {
                       text-left hover:border-brand-300 hover:bg-brand-50 hover:shadow-card
                       transition-all duration-200 group disabled:opacity-50"
                   >
-                    <span className="text-2xl">{p.emoji}</span>
                     <div>
                       <p className="font-medium text-sm text-slate-800 group-hover:text-brand-700">
                         {p.text}
